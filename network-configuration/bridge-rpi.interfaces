@@ -1,0 +1,16 @@
+auto eth0
+iface eth0 inet manual
+    up ifconfig eth0 up
+
+auto eth1
+iface eth1 inet manual
+    up ifconfig eth1 up
+
+# iproutes2 commands are used here because bridge-utils is not installed by default on Raspbian.
+
+auto br0
+iface br0 inet static
+    pre-up ip link add name br0 type bridge && ip link set eth0 master br0 && ip link set eth1 master br0
+    post-down ip link delete br0 type bridge
+    address 10.0.0.4
+    netmask 255.255.0.0
