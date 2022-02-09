@@ -11,6 +11,8 @@ iface eth1 inet manual
 auto br0
 iface br0 inet static
     pre-up ip link add name br0 type bridge && ip link set eth0 master br0 && ip link set eth1 master br0
+# Add a delay to this bridge to make sure the other/MITM route arrives first.
+    post-up tc qdisc add dev br0 root netem delay 1000ms
     post-down ip link delete br0 type bridge
     address 10.0.0.4
     netmask 255.255.0.0
