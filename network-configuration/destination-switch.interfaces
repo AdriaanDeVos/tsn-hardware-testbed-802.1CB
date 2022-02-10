@@ -19,7 +19,7 @@ iface swp2 inet manual
 
 auto br0
 iface br0 inet static
-	pre-up brctl addbr br0 && brctl addif br0 swp0 swp1 swp2 && brctl stp br0 on && brctl setportprio br0 swp2 5
+	pre-up brctl addbr br0 && brctl addif br0 swp0 swp1 swp2 && brctl stp br0 on && brctl setpathcost br0 swp2 8
 	post-down brctl delbr br0
 	address 10.0.0.5
 	netmask 255.255.0.0
