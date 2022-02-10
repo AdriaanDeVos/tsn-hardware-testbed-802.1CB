@@ -2,7 +2,7 @@ auto lo
 iface lo inet loopback
 
 auto eno0
-iface eno0.1 inet manual
+iface eno0 inet manual
 	up ifconfig eno0 up
 
 auto eno2
@@ -23,3 +23,4 @@ iface br0 inet static
 	post-down brctl delbr br0
 	address 10.0.0.2
 	netmask 255.255.0.0
+
