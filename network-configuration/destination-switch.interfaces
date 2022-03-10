@@ -20,4 +20,5 @@ iface swp2 inet manual
 auto br0
 iface br0 inet static
 	pre-up ip link add name br0 type bridge vlan_filtering 1 && ip link set br0 up && ip link set swp0 master br0 && ip link set swp1 master br0 && ip link set swp2 master br0 && bridge vlan add dev swp0 vid 1 pvid && bridge vlan add dev swp1 vid 1 pvid && bridge vlan add dev swp2 vid 1 pvid
+	post-up bridge fdb add 61:64:72:69:61:6e dev swp2 vlan 1 && tsntool cbstreamidset --device swp2 --index 1 --nullstreamid --nulldmac 0x61647269616E --nullvid 1 --streamhandle 1 && tsntool cbrec --device swp0 --index 1 --seq_len 16 --his_len 31 --rtag_pop_en
 	post-down brctl delbr br0
