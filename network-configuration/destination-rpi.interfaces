@@ -1,9 +1,0 @@
-auto eth0
-iface eth0 inet static
-	address 10.0.0.6
-	netmask 255.255.0.0
-
-auto wlan0
-iface wlan0 inet dhcp
-        wpa-ssid adriaanhotspot
-        wpa-psk adriaandevosisastudent
