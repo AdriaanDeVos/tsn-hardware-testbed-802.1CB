@@ -1,6 +1,10 @@
 # tsn-hardware-testbed-802.1CB
 Contains configuration files and scripts to perform Time-Sensitive Networking tests on a hardware testbed. Specifically the IEEE 802.1CB specification.
 
+The `network-configuration` folder contain the `/etc/network/interfaces` files for each specific device.  
+The `wifi-configuration` folder contains documentation and the required files for setting op the wifi hotspot on the source device. This is used for remote access to this device, and then managing al the other devices through this source device.  
+The `scapy` folder contains scripts that are used to generate, modify, and receive network packets.
+
 ## TCPDUMP
 tcpdump -i eth0 -vv -e -nn
 
