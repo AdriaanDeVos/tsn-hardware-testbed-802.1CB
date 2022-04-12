@@ -5,14 +5,12 @@
 # Page 49 of the IEEE 802.1CB standard
 
 import copy
+import time
 
+from RedundancyTag import RedundancyTag
 from scapy.compat import raw
-from scapy.data import ETHER_TYPES, ETH_P_IP
-from scapy.fields import ShortField, XShortEnumField
 from scapy.layers.l2 import Ether
-from scapy.layers.inet import IP
-from scapy.packet import Packet, bind_layers
-from scapy.sendrecv import sniff
+from scapy.sendrecv import AsyncSniffer
 
 
 def decap(orig_pkt):
@@ -32,16 +30,9 @@ def decap(orig_pkt):
     return prev_layer / next_layer
 
 
-# Should be 0xF1C1, but its 0x2345 on NXP
-class RedundancyTag(Packet):
-    name = "RedundancyTag"
-    fields_desc = [
-        ShortField("SequenceNumber", 0),
-        XShortEnumField("type", 0x0800, ETHER_TYPES)
-    ]
+"""Sniff all incoming packets"""
+sniffer = AsyncSniffer(iface="eth1", prn=Ether.show)
+sniffer.start()
 
-
-bind_layers(Ether, RedundancyTag, type=0x2345)
-bind_layers(RedundancyTag, IP, type=ETH_P_IP)
-
-sniff(iface="eth1", prn=Ether.show)
+while True:
+    time.sleep(1)
