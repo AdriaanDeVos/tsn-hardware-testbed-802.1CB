@@ -53,7 +53,7 @@ def stay_ahead(pkt):
     if pkt.haslayer(RedundancyTag):
         pkt[RedundancyTag].SequenceNumber += 1
         debug_number = pkt[Raw].load.decode("utf-8").split(' ')[0]
-        pkt[Raw].load = debug_number + " Break the car!"
+        pkt[Raw].load = debug_number + " Stop the car!"
         return pkt
     else:
         return False
