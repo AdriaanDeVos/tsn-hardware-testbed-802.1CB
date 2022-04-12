@@ -11,7 +11,7 @@ class RedundancyTag(Packet):
     """Define the fields contained in the Redundancy Tag"""
     name = "RedundancyTag"
     fields_desc = [
-        ShortField("SequenceNumber", 0),
+        ShortField("sequence_number", 0),
         XShortEnumField("type", 0x0800, ETHER_TYPES)
     ]
 
