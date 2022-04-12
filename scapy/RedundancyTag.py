@@ -17,7 +17,7 @@ class RedundancyTag(Packet):
 
 
 def decap(orig_pkt):
-    """decapsulate a FRER frame (WIP NEEDS TESTING)"""
+    """Decapsulate a FRER frame."""
     if not isinstance(orig_pkt, Ether) or \
             not isinstance(orig_pkt.payload, RedundancyTag):
         raise TypeError(

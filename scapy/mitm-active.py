@@ -136,4 +136,4 @@ def speed_up(pkt):
 attack_method = determine_attack()
 time.sleep(1)
 
-bridge_and_sniff(if1="eth0", if2="eth1", xfrm12=attack_method)
+bridge_and_sniff(if1=input_interface, if2=output_interface, xfrm12=attack_method)
