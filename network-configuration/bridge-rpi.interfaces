@@ -6,7 +6,7 @@ auto eth1
 iface eth1 inet manual
     up ifconfig eth1 up
 # Add a delay to this interface to make sure the other/MITM route arrives first.
-    post-up tc qdisc add dev eth1 root netem delay 50ms
+    post-up tc qdisc add dev eth1 root netem delay 60ms
 
 # iproutes2 commands are used here because bridge-utils is not installed by default on Raspbian.
 

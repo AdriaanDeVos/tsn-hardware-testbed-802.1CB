@@ -126,8 +126,6 @@ def speed_up(pkt):
     if pkt.haslayer(RedundancyTag):
         speedup_counter += 1
         pkt[RedundancyTag].sequence_number += speedup_counter * speed_multiplier
-        debug_number = pkt[Raw].load.decode("utf-8").split(' ')[0]
-        pkt[Raw].load = debug_number + " Stop the car!"
         return pkt
     else:
         return False

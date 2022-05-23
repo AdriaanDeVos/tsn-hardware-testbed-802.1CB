@@ -11,10 +11,20 @@ from scapy.layers.inet import IP
 from scapy.packet import Raw
 from scapy.sendrecv import AsyncSniffer
 
+counter = None
+
 
 def print_raw(pkt):
+    global counter
     if pkt.haslayer(Raw) and pkt[IP].dst == "10.0.0.2":
-        print(pkt[Raw].load.decode("utf-8").rstrip('\x00'))
+        payload = pkt[Raw].load.decode("utf-8").rstrip('\x00')
+        payload_counter = int(payload.split()[0])
+        output = payload
+        if counter is not None:
+            if (counter + 1) != payload_counter or "Stop" in payload:
+                output += " <- Possible attack detected!"
+        counter = payload_counter
+        print(output)
 
 
 """Sniff all incoming packets"""
